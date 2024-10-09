@@ -6,10 +6,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { RegisterScreen } from './src/screens/RegisterScreen';
 
-// Pantallas
-//import HomeScreen from './src/screens/HomeScreen';
-//import ProfileScreen from './src/screens/ProfileScreen';
-
 const Drawer = createDrawerNavigator();
 
 export default function App() {
@@ -17,8 +13,9 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <Drawer.Navigator initialRouteName="Home">
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="Register" component={RegisterScreen} />
+          <Drawer.Screen name="Inicio" component={HomeScreen} />
+          <Drawer.Screen name="Registro de ventas" component={RegisterScreen} />
+          <Drawer.Screen name="Reporte de ventas" component={RegisterScreen} />
         </Drawer.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { HomeScreen } from "../../src/screens/HomeScreen";
-import { RegisterScreen } from "../../src/screens/RegisterScreen";
+import { HomeScreen } from "../screens/HomeScreen";
+import { RegisterScreen } from "../screens/RegisterScreen";
 
 
 export const menu = [
