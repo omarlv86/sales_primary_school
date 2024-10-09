@@ -1,8 +1,9 @@
-import { Text, View, FlatList, StyleSheet, StatusBar} from 'react-native'
+import { Text, View, FlatList, StyleSheet, StatusBar, ScrollView} from 'react-native'
 import React, { useState, useEffect } from 'react'
 import dayjs from 'dayjs';
 import SQLite from 'react-native-sqlite-storage';
 import { Dropdown } from 'react-native-element-dropdown';
+import { map } from 'lodash';
 
 const db = SQLite.openDatabase({ name: 'miBD.db' });
 
@@ -82,8 +83,8 @@ export const  ReportScreen  = () => {
             maxHeight={300}
             labelField="label"
             valueField="value"
-            placeholder={!isFocus ? 'Select item' : '...'}
-            searchPlaceholder="Search..."
+            placeholder={!isFocus ? 'Selecciona' : '...'}
+            searchPlaceholder="Buscar..."
             value={value}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
@@ -94,12 +95,30 @@ export const  ReportScreen  = () => {
             }}
             />
         </View>
-        <View style={{top:15}}>
-            <FlatList
-                data={ventas}
-                renderItem={({item}) => <Item venta={item.venta} fecha={item.fecha_venta}/>}
-                keyExtractor={item => item.id}
-            />
+        <View style={[styles.row, {top:2}]}>
+            <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
+                <Text style={styles.title}>Venta</Text>
+            </View>
+            <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
+                <Text style={styles.title}>Fecha</Text>
+            </View>
+        </View>
+        <ScrollView style={{maxHeight:400, paddingBottom:5}}>
+                {
+                 map(ventas, (sale, index) => (
+                    <View style={styles.row} key={index}>
+                        <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
+                            <Text style={styles.title}>$ {sale.venta}</Text>
+                        </View>
+                        <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
+                            <Text style={styles.title}>{sale.fecha_venta}</Text>
+                        </View>
+                    </View>
+                 ))
+                }
+        </ScrollView>
+        <View style={{padding:10}}>
+
         </View>
       </View>
     )
@@ -117,6 +136,9 @@ const styles = StyleSheet.create({
       marginVertical: 8,
       marginHorizontal: 16,
     },
+    text: {
+        fontSize: 42,
+      },
     title: {
       fontSize: 18,
       textAlign:'center',
