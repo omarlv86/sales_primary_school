@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import SQLite from 'react-native-sqlite-storage';
 import { Dropdown } from 'react-native-element-dropdown';
 import { map } from 'lodash';
+import Pdf from 'react-native-pdf';
 
 const db = SQLite.openDatabase({ name: 'miBD.db' });
 
@@ -83,6 +84,32 @@ export const  ReportScreen  = () => {
         });
     
       }
+
+
+      const descargarPDF = async () => {
+        const pdf = new Pdf();
+        console.log(pdf)
+        pdf.addPage();
+        pdf.setFont('Helvetica', '12');
+        ventas.forEach((dato, index) => {
+          pdf.text(`Fila ${index + 1}: ${dato.venta} - ${dato.fecha_venta}`, 10, 20 + index * 10);
+        });
+        const archivo = await pdf.saveToDevice(`/reporte_de_ventas_${data[month-1].label}.pdf`);
+        RNFS.writeFile(RNFS.DownloadDirectoryPath + `/reporte_de_ventas_${data[month-1].label}.pdf`, archivo, 'binary').then((r)=>{
+          ToastAndroid.showWithGravity(
+            'PDF guardado correctamente.',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+         console.log('Success');
+        }).catch((e)=>{
+          console.log('Error', e);
+        });
+      };
+    
+
+      
+
       const handleClick = async () => {
     
         try{
@@ -228,19 +255,6 @@ export const  ReportScreen  = () => {
                     }}>
                         <Text style={{textAlign: 'center', color: 'white'}}>
                             Guardar Excel
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => exportDataToExcel()}
-                        style={{
-                        width: '50%',
-                        paddingVertical: 10,
-                        paddingHorizontal: 15,
-                        backgroundColor: '#C4302B',
-                        marginVertical: 20,
-                    }}>
-                        <Text style={{textAlign: 'center', color: 'white'}}>
-                            Guardar PDF
                         </Text>
                     </TouchableOpacity>
                 </View>
