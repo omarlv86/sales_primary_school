@@ -1,4 +1,4 @@
-import {Alert, Modal, StyleSheet, Text, Pressable, View, TextInput} from 'react-native';
+import {Alert, Modal, StyleSheet, Text, Pressable, View, TextInput, ToastAndroid} from 'react-native';
 import React, { useState }from 'react'
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
@@ -24,8 +24,13 @@ export const  RegisterScreen  = () => {
         //console.log(query)
         db.transaction(tx => {
           tx.executeSql(query, [], (tx, results) => {
+            ToastAndroid.showWithGravity(
+              'Registro agregado con éxito.',
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
             console.log('Registro agregado con éxito');
-            setVenta('');
+            onChangeNumber('');
           }, error => {
             console.error('Error al agregar registro:', error);
           });
@@ -44,8 +49,8 @@ export const  RegisterScreen  = () => {
         VALUES (?, ?);
       `, [venta, fechaVenta], (tx, results) => {
         console.log('Registro agregado con éxito');
-        setVenta('');
-        setFechaVenta('');
+        onChangeNumber('');
+        //setFechaVenta('');
       }, error => {
         console.error('Error al agregar registro:', error);
       });
@@ -118,4 +123,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
+  input:{
+    color:'black'
+  }
 });

@@ -1,4 +1,4 @@
-import { Text, View, FlatList, StyleSheet, StatusBar, ScrollView, TouchableOpacity, PermissionsAndroid} from 'react-native'
+import { Text, View, FlatList, StyleSheet, StatusBar, ScrollView, TouchableOpacity, PermissionsAndroid, ToastAndroid} from 'react-native'
 import React, { useState, useEffect } from 'react'
 import dayjs from 'dayjs';
 import SQLite from 'react-native-sqlite-storage';
@@ -34,12 +34,15 @@ export const  ReportScreen  = () => {
     const [isFocus, setIsFocus] = useState(false);
     const [ventas, setVentas] = useState([]);
 
+
+    console.log(data[month-1].label)
+
     useEffect(() => {
         obtenerVentas();
     }, [month]);
 
     const obtenerVentas = () => {
-        const query = `SELECT * FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31'`
+        const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31'`
         console.log(query)
         db.transaction(tx => {
         tx.executeSql(query, [], (tx, results) => {
@@ -58,17 +61,22 @@ export const  ReportScreen  = () => {
     const exportDataToExcel = () => {
 
         // Created Sample data
-        let sample_data_to_export = [{id: '1', name: 'First User'},{ id: '2', name: 'Second User'}];
+        //let sample_data_to_export = [{id: '1', name: 'First User'},{ id: '2', name: 'Second User'}];
     
         let wb = XLSX.utils.book_new();
-        let ws = XLSX.utils.json_to_sheet(sample_data_to_export)    
-        XLSX.utils.book_append_sheet(wb,ws,"Users")
+        let ws = XLSX.utils.json_to_sheet(ventas)    
+        XLSX.utils.book_append_sheet(wb,ws,"Ventas")
         const wbout = XLSX.write(wb, {type:'binary', bookType:"xlsx"});
     
         // Write generated excel to Storage
         //RNFS.ExternalStorageDirectoryPath
         
-        RNFS.writeFile(RNFS.DownloadDirectoryPath  + '/my_exported_file.xlsx', wbout, 'ascii').then((r)=>{
+        RNFS.writeFile(RNFS.DownloadDirectoryPath  + `/reporte_de_ventas_${data[month-1].label}.xlsx`, wbout, 'ascii').then((r)=>{
+          ToastAndroid.showWithGravity(
+            'Excel guardado correctamente.',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
          console.log('Success');
         }).catch((e)=>{
           console.log('Error', e);
@@ -151,13 +159,15 @@ export const  ReportScreen  = () => {
         return granted;
       }
 
+      console.log(dayjs('2024-10-09').format('DD-MM-YYYY'))
+
     return (
       <View style={{marginHorizontal:10}}>
         <View style={{alignItems:'center', top:10, }}>
             <Text style={{fontSize:20, color:'#000', textAlign:'center'}}>Reporte de ventas del periodo de {meses[month-1]}</Text>
         </View>
         <View style={{marginTop:20, }}>
-            <Text style={{fontSize:16}}>Selecciona el mes</Text>
+            <Text style={{fontSize:16, color:'black'}}>Selecciona el mes</Text>
         </View>
         <View>
             <Dropdown
@@ -199,23 +209,25 @@ export const  ReportScreen  = () => {
                             <Text style={styles.title}>$ {sale.venta}</Text>
                         </View>
                         <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
-                            <Text style={styles.title}>{sale.fecha_venta}</Text>
+                            {/* <Text style={styles.title}>{sale.fecha_venta}</Text> */}
+                            <Text style={styles.title}>{dayjs(sale.fecha_venta).format('DD/MM/YYYY')}</Text>
+                            
                         </View>
                     </View>
                  ))
                 }
                 <View style={{padding:10}}>
                     <TouchableOpacity
-                        onPress={() => handleClick()}
+                        onPress={() => exportDataToExcel()}
                         style={{
                         width: '50%',
                         paddingVertical: 10,
                         paddingHorizontal: 15,
-                        backgroundColor: 'blue',
+                        backgroundColor: '#2D572C',
                         marginVertical: 20,
                     }}>
                         <Text style={{textAlign: 'center', color: 'white'}}>
-                            Export to Excel
+                            Guardar Excel
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -224,11 +236,11 @@ export const  ReportScreen  = () => {
                         width: '50%',
                         paddingVertical: 10,
                         paddingHorizontal: 15,
-                        backgroundColor: 'blue',
+                        backgroundColor: '#C4302B',
                         marginVertical: 20,
                     }}>
                         <Text style={{textAlign: 'center', color: 'white'}}>
-                            Permissions
+                            Guardar PDF
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -256,7 +268,8 @@ const styles = StyleSheet.create({
     title: {
       fontSize: 18,
       textAlign:'center',
-      padding:5
+      padding:5,
+      color:'black'
     },
     row: {
         display:'flex',
