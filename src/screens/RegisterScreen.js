@@ -35,6 +35,12 @@ export const  RegisterScreen  = () => {
             console.error('Error al agregar registro:', error);
           });
         });
+      }else{
+        ToastAndroid.showWithGravity(
+          'Por favor ingresa la cantidad vendida.',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
       }
     } catch (error) {
       console.log(error)
@@ -61,6 +67,9 @@ export const  RegisterScreen  = () => {
 
     return (
       <View style={{marginHorizontal:10}}>
+        <View>
+          <Text style={{color:'black', marginTop:20, fontSize:16}}>Ingresa la cantidad vendida el dia de hoy</Text>
+        </View>
         <View style={{backgroundColor:'#fff', marginTop:20, borderRadius:10, marginBottom:20}}>
           <TextInput
             style={styles.input}
@@ -124,6 +133,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input:{
-    color:'black'
+    color:'black',
   }
 });
