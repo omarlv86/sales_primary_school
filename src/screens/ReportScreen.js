@@ -44,7 +44,7 @@ export const  ReportScreen  = () => {
 
 
     const obtenerVentas = () => {
-        const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31'`
+        const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31' ORDER BY fecha_venta`
         db.transaction(tx => {
         tx.executeSql(query, [], (tx, results) => {
             const ventas = [];
@@ -69,7 +69,6 @@ export const  ReportScreen  = () => {
   
       // Agrega un nuevo objeto al array
       total.push({ fecha_venta: '', venta: totalVentas });
-      //console.log(total)
       return total
     };
 
@@ -78,7 +77,6 @@ export const  ReportScreen  = () => {
         // Created Sample data
         //let sample_data_to_export = [{id: '1', name: 'First User'},{ id: '2', name: 'Second User'}];
         newArrVentas = agregarTotal()
-        console.log(newArrVentas)
         let wb = XLSX.utils.book_new();
         let ws = XLSX.utils.json_to_sheet(newArrVentas)    
         XLSX.utils.book_append_sheet(wb,ws,"Ventas")
@@ -278,7 +276,7 @@ export const  ReportScreen  = () => {
                             Guardar Excel
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => agregarTotal()}
                         style={{
                         width: '50%',
@@ -290,7 +288,7 @@ export const  ReportScreen  = () => {
                         <Text style={{textAlign: 'center', color: 'white'}}>
                             Agregar total
                         </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
         </ScrollView>
         

@@ -1,9 +1,10 @@
 import {Alert, Modal, StyleSheet, Text, Pressable, View, TextInput, ToastAndroid} from 'react-native';
 import React, { useState }from 'react'
-import DateTimePicker from 'react-native-ui-datepicker';
+import { Switch } from '@rneui/themed';
 import dayjs from 'dayjs';
 import { Button, Input, Overlay } from 'react-native-elements';
 import SQLite from 'react-native-sqlite-storage';
+import { DatePickerInput } from 'react-native-paper-dates';
 
 const db = SQLite.openDatabase({ name: 'miBD.db' });
 
@@ -11,17 +12,23 @@ export const  RegisterScreen  = () => {
 
   const [date, setDate] = useState(dayjs().format('DD/MM/YYYY'));
   const [modalVisible, setModalVisible] = useState(true)
-  const [number, onChangeNumber] = React.useState('');
-  //console.log(dayjs().format('YYYY-MM-DD'))
-  //console.log('año: ',dayjs().format('YYYY'))
+  const [number, onChangeNumber] = useState('');
+  const [checked, setChecked] = useState(true);
+  const [inputDate, setInputDate] = useState(new Date())
+  
 
   const saveSale = (sale) => {
     try {
       if(sale != ''){
-        const fecha_venta = dayjs().format('YYYY-MM-DD')
-        //console.log('Guardar registro: ',sale, fecha_venta)
-        const query = `INSERT INTO ventas (venta, fecha_venta) VALUES (${sale}, '${fecha_venta}');`
-        //console.log(query)
+        let query = '';
+        if(checked){
+          const fecha_venta = dayjs().format('YYYY-MM-DD')
+          query = `INSERT INTO ventas (venta, fecha_venta) VALUES (${sale}, '${fecha_venta}');`
+        }else{
+          const fecha_anterior = dayjs(inputDate).format('YYYY-MM-DD')
+          query = `INSERT INTO ventas (venta, fecha_venta) VALUES (${sale}, '${fecha_anterior}');`
+        }
+        
         db.transaction(tx => {
           tx.executeSql(query, [], (tx, results) => {
             ToastAndroid.showWithGravity(
@@ -43,30 +50,54 @@ export const  RegisterScreen  = () => {
         );
       }
     } catch (error) {
-      console.log(error)
+      ToastAndroid.showWithGravity(
+        `Error: ${error}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
     }
     
   }
 
-  const agregarRegistro = () => {
-    db.transaction(tx => {
-      tx.executeSql(`
-        INSERT INTO ventas (venta, fecha_venta)
-        VALUES (?, ?);
-      `, [venta, fechaVenta], (tx, results) => {
-        console.log('Registro agregado con éxito');
-        onChangeNumber('');
-        //setFechaVenta('');
-      }, error => {
-        console.error('Error al agregar registro:', error);
-      });
-    });
-  };
-
-
-
+  
     return (
       <View style={{marginHorizontal:10}}>
+        <View style={{display:'flex', flexDirection:'row', marginTop:20}}>
+          <View style={{width:'70%', justifyContent:'center', }}>
+            <Text style={{color:'black', fontSize:16}}>Usar la fecha actual para el registro:</Text>
+          </View>
+          <View style={{width:'30%', justifyContent:'center'}}>
+            <Switch
+              value={checked}
+              onValueChange={() => setChecked(!checked)}
+            />
+          </View>
+        </View>
+        <View>
+          {
+            checked ? (
+              <View style={{backgroundColor:'#fff', marginTop:20, borderRadius:10, marginBottom:20}}>
+                <TextInput
+                  style={styles.input}
+                  value={dayjs()}
+                  placeholder=" Ingrese la cantidad vendida el dia de hoy..."
+                  keyboardType="numeric"
+                  editable={false}
+                />
+              </View>
+            ) : (
+              <View style={{marginVertical:30}}>
+                <DatePickerInput
+                  locale="es"
+                  label="Fecha"
+                  value={inputDate}
+                  onChange={(d) => setInputDate(d)}
+                  inputMode="start"
+                />
+              </View>
+            )
+          }
+        </View>
         <View>
           <Text style={{color:'black', marginTop:20, fontSize:16}}>Ingresa la cantidad vendida el dia de hoy</Text>
         </View>
