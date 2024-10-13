@@ -32,6 +32,7 @@ export const  ReportScreen  = () => {
       ];
     const [month, setMonth] = useState(dayjs().format('M'));
     const [year, setYear] = useState(dayjs().format('YYYY'));
+    const [totalVentas, setTotalVentas] = useState(0)
     
     const [value, setValue] = useState(dayjs().format('M'));
     const [isFocus, setIsFocus] = useState(false);
@@ -50,6 +51,11 @@ export const  ReportScreen  = () => {
             for (let i = 0; i < results.rows.length; i++) {
             ventas.push(results.rows.item(i));
             }
+            const sumaTotal = ventas.reduce((acc, objeto) => {
+              return acc + parseFloat(objeto.venta);
+            }, 0);
+            setTotalVentas(sumaTotal)
+            
             setVentas(ventas);
         }, error => {
             console.error('Error al obtener ventas:', error);
@@ -57,13 +63,24 @@ export const  ReportScreen  = () => {
         });
     };
 
+    const agregarTotal = () => {
+      // Crea una copia del array actual de ventas
+      const total = [...ventas];
+  
+      // Agrega un nuevo objeto al array
+      total.push({ fecha_venta: '', venta: totalVentas });
+      //console.log(total)
+      return total
+    };
+
     const exportDataToExcel = () => {
 
         // Created Sample data
         //let sample_data_to_export = [{id: '1', name: 'First User'},{ id: '2', name: 'Second User'}];
-    
+        newArrVentas = agregarTotal()
+        console.log(newArrVentas)
         let wb = XLSX.utils.book_new();
-        let ws = XLSX.utils.json_to_sheet(ventas)    
+        let ws = XLSX.utils.json_to_sheet(newArrVentas)    
         XLSX.utils.book_append_sheet(wb,ws,"Ventas")
         const wbout = XLSX.write(wb, {type:'binary', bookType:"xlsx"});
     
@@ -184,7 +201,6 @@ export const  ReportScreen  = () => {
           PermissionsAndroid.PERMISSIONS.CAMERA,
         ]);
 
-        console.log('granted:', granted)
         return granted;
       }
 
@@ -238,13 +254,16 @@ export const  ReportScreen  = () => {
                             <Text style={styles.title}>$ {sale.venta}</Text>
                         </View>
                         <View style={{borderColor:'gray', borderWidth:1, width:'50%'}}>
-                            {/* <Text style={styles.title}>{sale.fecha_venta}</Text> */}
                             <Text style={styles.title}>{dayjs(sale.fecha_venta).format('DD/MM/YYYY')}</Text>
                             
                         </View>
                     </View>
                  ))
                 }
+                <View style={{alignItems:'center', marginVertical:10}}>
+                  <Text style={{fontSize:18, color:'black'}}>La venta total es de $<Text style={{fontWeight:'bold'}}> {totalVentas}</Text></Text>
+                </View>
+                
                 <View style={{padding:10}}>
                     <TouchableOpacity
                         onPress={() => exportDataToExcel()}
@@ -257,6 +276,19 @@ export const  ReportScreen  = () => {
                     }}>
                         <Text style={{textAlign: 'center', color: 'white'}}>
                             Guardar Excel
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => agregarTotal()}
+                        style={{
+                        width: '50%',
+                        paddingVertical: 10,
+                        paddingHorizontal: 15,
+                        backgroundColor: '#2D572C',
+                        marginVertical: 20,
+                    }}>
+                        <Text style={{textAlign: 'center', color: 'white'}}>
+                            Agregar total
                         </Text>
                     </TouchableOpacity>
                 </View>
