@@ -1,10 +1,11 @@
-import { Text, View, FlatList, StyleSheet, StatusBar, ScrollView, TouchableOpacity, PermissionsAndroid, ToastAndroid} from 'react-native'
+import { Text, View, FlatList, StyleSheet, StatusBar, ScrollView, TouchableOpacity, PermissionsAndroid, ToastAndroid, Platform} from 'react-native'
 import React, { useState, useEffect } from 'react'
 import dayjs from 'dayjs';
 import SQLite from 'react-native-sqlite-storage';
 import { Dropdown } from 'react-native-element-dropdown';
 import { map } from 'lodash';
 import Pdf from 'react-native-pdf';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 const db = SQLite.openDatabase({ name: 'miBD.db' });
 
@@ -13,6 +14,7 @@ import XLSX from 'xlsx'
 
 
 export const  ReportScreen  = () => {
+    const reportIsFocused = useIsFocused();
     const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
     const data = [
         { label: 'Enero', value: '1' },
@@ -35,19 +37,15 @@ export const  ReportScreen  = () => {
     const [isFocus, setIsFocus] = useState(false);
     const [ventas, setVentas] = useState([]);
 
-
-    console.log(data[month-1].label)
-
     useEffect(() => {
         obtenerVentas();
-    }, [month]);
+    }, [month, reportIsFocused]);
+
 
     const obtenerVentas = () => {
         const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31'`
-        console.log(query)
         db.transaction(tx => {
         tx.executeSql(query, [], (tx, results) => {
-            console.log(results.rows)
             const ventas = [];
             for (let i = 0; i < results.rows.length; i++) {
             ventas.push(results.rows.item(i));
@@ -78,9 +76,13 @@ export const  ReportScreen  = () => {
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
           );
-         console.log('Success');
         }).catch((e)=>{
           console.log('Error', e);
+          ToastAndroid.showWithGravity(
+            `Error ${e}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
         });
     
       }
