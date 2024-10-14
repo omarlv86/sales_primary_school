@@ -42,9 +42,10 @@ export const  ReportScreen  = () => {
         obtenerVentas();
     }, [month, reportIsFocused]);
 
-
     const obtenerVentas = () => {
-        const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${month}-01' and fecha_venta <= '${year}-${month}-31' ORDER BY fecha_venta`
+        const mes = month.length > 1 ? month  : `0${month}`
+        
+        const query = `SELECT fecha_venta, venta FROM ventas WHERE fecha_venta >= '${year}-${mes}-01' and fecha_venta <= '${year}-${mes}-31' ORDER BY fecha_venta`
         db.transaction(tx => {
         tx.executeSql(query, [], (tx, results) => {
             const ventas = [];
@@ -201,8 +202,6 @@ export const  ReportScreen  = () => {
 
         return granted;
       }
-
-      console.log(dayjs('2024-10-09').format('DD-MM-YYYY'))
 
     return (
       <View style={{marginHorizontal:10}}>

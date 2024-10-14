@@ -11,6 +11,7 @@ const db = SQLite.openDatabase({ name: 'miBD.db' });
 export const  RegisterScreen  = () => {
 
   const [date, setDate] = useState(dayjs().format('DD/MM/YYYY'));
+  console.log(date)
   const [modalVisible, setModalVisible] = useState(true)
   const [number, onChangeNumber] = useState('');
   const [checked, setChecked] = useState(true);
@@ -36,7 +37,6 @@ export const  RegisterScreen  = () => {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
-            console.log('Registro agregado con éxito');
             onChangeNumber('');
           }, error => {
             console.error('Error al agregar registro:', error);
@@ -79,9 +79,9 @@ export const  RegisterScreen  = () => {
               <View style={{backgroundColor:'#fff', marginTop:20, borderRadius:10, marginBottom:20}}>
                 <TextInput
                   style={styles.input}
-                  value={dayjs()}
-                  placeholder=" Ingrese la cantidad vendida el dia de hoy..."
-                  keyboardType="numeric"
+                  value={date}
+                  placeholder="Ingrese la fecha de hoy."
+                  keyboardType="default"
                   editable={false}
                 />
               </View>
